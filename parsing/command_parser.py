@@ -1,5 +1,5 @@
 from pyparsing import *
-from command import *
+from .commands import *
 
 
 class CommandParser:
@@ -15,12 +15,12 @@ class CommandParser:
 
     def make_bnf(self):
         inv_verb = oneOf("INV INVENTORY I", caseless=True)
-        choice_verb = Literal('DO') | empty
+        choice_verb = oneOf('DO', caseless=True) | empty
         look_verb = oneOf('LOOK', caseless=True)
         help_verb = oneOf("HELP H ?", caseless=True)
 
         inv_command = inv_verb
-        choice_command = choice_verb + Word(nums)
+        choice_command = choice_verb + Word(nums).setResultsName('choice')
         look_command = look_verb
         help_command = help_verb
 
@@ -40,4 +40,4 @@ class CommandParser:
         try:
             return self.bnf.parseString(command_string)
         except ParseException:
-            print('PARSE EXCEPTION')
+            print('**Error parsing command input.**')

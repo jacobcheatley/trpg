@@ -92,17 +92,17 @@
         {
           "__type__": "option",
           "desc": "Go to this forest place or whatever IDK.",
-          "func": "GOTO('forest')"
+          "func": "goto('forest')"
         },
         {
           "__type__": "option",
           "desc": "Deal 1 damage to me.",
-          "func": "DEC_HEALTH(1)"
+          "func": "dec_health(1)"
         },
         {
           "__type__": "option",
           "desc": "Giff test item.",
-          "func": "GIVE_ITEM('test', 1)"
+          "func": "give_item('test', 1)"
         }
       ]
     },
@@ -114,7 +114,7 @@
         {
           "__type__": "option",
           "desc": "Well if it's so lame here, how about you go back.",
-          "func": "GOTO('start')"
+          "func": "goto('start')"
         }
       ]
     }

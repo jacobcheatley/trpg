@@ -15,6 +15,7 @@ class Command:
 
 
 class InventoryCommand(Command):
+    """Command class for showing inventory."""
     def __init__(self, quals):
         super().__init__('INV')
 
@@ -27,11 +28,16 @@ class InventoryCommand(Command):
 
 
 class ChoiceCommand(Command):
+    """Command class for choosing an option in a scenario."""
     def __init__(self, quals):
         super().__init__('DO')
+        try:
+            self.option_number = int(quals['choice'])
+        except ValueError:
+            self.option_number = -1
 
     def _do_command(self, campaign):
-        campaign.dummy_function()
+        campaign.choose_option(self.option_number)
 
     @staticmethod
     def help_description():
@@ -39,6 +45,7 @@ class ChoiceCommand(Command):
 
 
 class LookCommand(Command):
+    """Command class for showing scenario information again."""
     def __init__(self, quals):
         super().__init__('LOOK')
 
@@ -51,6 +58,7 @@ class LookCommand(Command):
 
 
 class HelpCommand(Command):
+    """Command class for getting help on the other commands."""
     def __init__(self, quals):
         super().__init__('HELP')
 
