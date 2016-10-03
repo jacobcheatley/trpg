@@ -59,11 +59,11 @@ class StatSetting:
 
 
 class StatSettings:
-    def __init__(self, health_stat: StatSetting = None, resource_stats: Sequence[StatSetting] = None,
-                 normal_stats: Sequence[StatSetting] = None):
-        self.health_stat = health_stat
-        self.resource_stats = resource_stats
-        self.normal_stats = normal_stats
+    def __init__(self, health: StatSetting = None, resource: Sequence[StatSetting] = None,
+                 other: Sequence[StatSetting] = None):
+        self.health = health
+        self.resource = resource
+        self.other = other
 
 
 class ResourceStat:

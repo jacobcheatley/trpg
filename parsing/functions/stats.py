@@ -153,8 +153,7 @@ class GetResMaxFunction(Function):
 # CURRENT VALUE SETTERS
 class IncHealthFunction(Function):
     def __init__(self, args):
-        self.name = args[0]
-        self.value = args[1]
+        self.value = args[0]
 
     def _do_function(self, campaign):
         campaign.player.stats.health.current += self.value
@@ -162,8 +161,7 @@ class IncHealthFunction(Function):
 
 class DecHealthFunction(Function):
     def __init__(self, args):
-        self.name = args[0]
-        self.value = args[1]
+        self.value = args[0]
 
     def _do_function(self, campaign):
         campaign.player.stats.health.current -= self.value
@@ -171,8 +169,7 @@ class DecHealthFunction(Function):
 
 class SetHealthFunction(Function):
     def __init__(self, args):
-        self.name = args[0]
-        self.value = args[1]
+        self.value = args[0]
 
     def _do_function(self, campaign):
         campaign.player.stats.health.current = self.value
@@ -181,8 +178,7 @@ class SetHealthFunction(Function):
 # MIN VALUE SETTERS
 class IncHealthMinFunction(Function):
     def __init__(self, args):
-        self.name = args[0]
-        self.value = args[1]
+        self.value = args[0]
 
     def _do_function(self, campaign):
         campaign.player.stats.health.min += self.value
@@ -190,8 +186,7 @@ class IncHealthMinFunction(Function):
 
 class DecHealthMinFunction(Function):
     def __init__(self, args):
-        self.name = args[0]
-        self.value = args[1]
+        self.value = args[0]
 
     def _do_function(self, campaign):
         campaign.player.stats.health.min -= self.value
@@ -199,8 +194,7 @@ class DecHealthMinFunction(Function):
 
 class SetHealthMinFunction(Function):
     def __init__(self, args):
-        self.name = args[0]
-        self.value = args[1]
+        self.value = args[0]
 
     def _do_function(self, campaign):
         campaign.player.stats.health.min = self.value

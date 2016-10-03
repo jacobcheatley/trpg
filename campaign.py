@@ -3,16 +3,14 @@ from json_helper import hook
 from parsing.command_parser import CommandParser
 from parsing.function_parser import FunctionParser
 
+
 # Random Functions
-write_debug = print
-
-
-def do_nothing(*args, **kwargs):
-    pass
+def default_debug(message):
+    print('!!!' + message + '!!!')
 
 
 class Campaign:
-    def __init__(self, json_fp, read=input, write=print, debug=do_nothing):
+    def __init__(self, json_fp, read=input, write=print, debug=default_debug):
         """Represents all the data in an entire running campaign"""
 
         # Get a temporary dictionary of the deserialized campaign data
@@ -67,6 +65,15 @@ class Campaign:
     def available_options(self):
         return [option for option in self.current_scenario().options]
 
+    def health_setting(self):
+        return self.stats.health
+
+    def resource_setting(self, name):
+        return self.stats.resource[name]
+
+    def other_setting(self, name):
+        return self.stats.other[name]
+
     # COMMAND INPUT FUNCTIONS
     def dummy_function(self):
         """A useless function."""
@@ -75,8 +82,10 @@ class Campaign:
 
     def choose_option(self, option_number):
         try:
+            print(self.available_options()[1].func)
             self.run_function(self.available_options()[option_number-1].func)
-        except IndexError:
+        except IndexError as e:
+            self.debug(e)
             self.write('Not a valid option number.')
 
     def view_inventory(self, owner):
@@ -86,6 +95,19 @@ class Campaign:
         data = [(inventory.items[item_id], self.item_name(item_id), item_id) for item_id in sorted_ids]
         items_text = ['- {0[0]} {0[1]} [\'{0[2]}\']'.format(item_info) for item_info in data]
         self.write('**Currency:** {0.currency}\n**Items:**\n{1}'.format(inventory, '\n'.join(items_text)))
+
+    def view_stats(self):
+        """Displays the player's stats."""
+        stats = self.player.stats
+        health_string = '**{}:**: {}/{}'.format(self.health_setting().name, stats.health.current, stats.health.max)
+
+        resources_data = ((self.resource_setting(stat_id).name, stat.current, stat.max) for stat_id, stat in sorted(stats.resource.items()))
+        resources_string = '\n'.join(('**{}:**: {}/{}'.format(name, current, max) for name, current, max in resources_data))
+
+        other_data = ((self.other_setting(stat_id).name, stat.current) for stat_id, stat in sorted(stats.other.items()))
+        other_string = '\n'.join(('**{}:**: {}'.format(name, current) for name, current in other_data))
+
+        self.write('{}\n-\n{}\n-\n{}'.format(health_string, resources_string, other_string))
 
     # LANGUAGE FUNCTIONS
     def run_function(self, func_string):

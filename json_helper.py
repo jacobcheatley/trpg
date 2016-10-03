@@ -21,4 +21,8 @@ def hook(obj):
             return ResourceStat(**obj)
         elif obj_type == 'other_stat':
             return OtherStat(**obj)
+        elif obj_type == 'stat_settings':
+            return StatSettings(**obj)
+        elif obj_type == 'stat_setting':
+            return StatSetting(**obj)
     return obj

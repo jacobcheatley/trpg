@@ -54,9 +54,13 @@ class FunctionParser:
     @staticmethod
     def make_function_parse_action():
         def func_parse_action(string, location, tokens):
-            cls = tokens_map[tokens[0].name]
+            name = tokens[0].name
             args = tokens[0].args
-            return cls(args)
+            if name in tokens_map:
+                cls = tokens_map[name]
+                return cls(args)
+            else:
+                return NotImplementedFunction(args)
 
         return func_parse_action
 

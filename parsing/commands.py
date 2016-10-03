@@ -1,8 +1,5 @@
 class Command:
     """Base class for player input commands."""
-    def __init__(self, verb):
-        self.verb = verb
-
     def _do_command(self, campaign):
         pass
 
@@ -15,9 +12,9 @@ class Command:
 
 
 class InventoryCommand(Command):
-    """Command class for showing inventory."""
+    """Command class for showing player inventory."""
     def __init__(self, quals):
-        super().__init__('INV')
+        pass
 
     def _do_command(self, campaign):
         campaign.view_inventory(campaign.player)
@@ -27,10 +24,22 @@ class InventoryCommand(Command):
         return 'INV: Check your inventory.'
 
 
+class StatCommand(Command):
+    """Command class for showing player statistics."""
+    def __init__(self, quals):
+        pass
+
+    def _do_command(self, campaign):
+        campaign.view_stats()
+
+    @staticmethod
+    def help_description():
+        return 'STAT: Check your statistic.'
+
+
 class ChoiceCommand(Command):
     """Command class for choosing an option in a scenario."""
     def __init__(self, quals):
-        super().__init__('DO')
         try:
             self.option_number = int(quals['choice'])
         except ValueError:
@@ -41,13 +50,13 @@ class ChoiceCommand(Command):
 
     @staticmethod
     def help_description():
-        return 'nothing/DO <N>: Do option number N.'
+        return '<N>: Do option number N.'
 
 
 class LookCommand(Command):
     """Command class for showing scenario information again."""
     def __init__(self, quals):
-        super().__init__('LOOK')
+        pass
 
     def _do_command(self, campaign):
         campaign.view_current_scenario()
@@ -60,12 +69,13 @@ class LookCommand(Command):
 class HelpCommand(Command):
     """Command class for getting help on the other commands."""
     def __init__(self, quals):
-        super().__init__('HELP')
+        pass
 
     def _do_command(self, campaign):
         command_helps = [command.help_description() for command in [
             ChoiceCommand,
             InventoryCommand,
+            StatCommand,
             LookCommand
         ]]
         campaign.write('\n'.join(command_helps))

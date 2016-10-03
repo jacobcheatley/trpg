@@ -52,7 +52,7 @@
     },
     "other": {
       "dankness": {
-        "type": "stat_setting",
+        "__type__": "stat_setting",
         "name": "Dankness",
         "desc": "Dankness is like your score in life. Being dank is very important."
       }
