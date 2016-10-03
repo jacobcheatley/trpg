@@ -69,17 +69,15 @@ class FunctionParser:
 
     def make_function_parse_action(self):
         def func_parse_action(string, location, tokens):
+            # print('::', tokens)
             name = tokens[0].name
             args_temp = tokens[0].args
             args = []
-            if name != 'if':
-                for arg_temp in args_temp:
-                    try:
-                        args.append(arg_temp(self.campaign))
-                    except:
-                        args.append(arg_temp)
-            else:
-                args = args_temp
+            for arg_temp in args_temp:
+                try:
+                    args.append(arg_temp(self.campaign))
+                except:
+                    args.append(arg_temp)
             if name in tokens_map:
                 cls = tokens_map[name]
                 return cls(args)
@@ -137,14 +135,58 @@ class FunctionParser:
 
         return combined_function
 
+    @staticmethod
+    def if_parse_action(string, location, tokens):
+        def do_if(campaign):
+            if tokens[1]:
+                print('IF PASSED')
+                tokens[2](campaign)
+                return
+                # do this if code
+            else:
+                for elif_condition, elif_code in zip(tokens[4::3], tokens[5::3]):
+                    if elif_condition:
+                        print('ELIF PASSED')
+                        elif_code(campaign)
+                        return
+                        # do this elif code
+                else:
+                    if tokens[-2] == 'else':
+                        print('ELSE PASSED')
+                        tokens[-1](campaign)
+                        return
+                        # do this else code
+
+        return do_if
+
+    @staticmethod
+    def logical_parse_action(string, location, tokens):
+        if tokens[0] == 'if':
+            return FunctionParser.if_parse_action(string, location, tokens)
+        else:
+            return FunctionParser.code_parse_action(string, location, tokens)
+
+    @staticmethod
+    def program_parse_action(string, location, tokens):
+        def program_result(campaign):
+            for statement in tokens:
+                # print(statement)
+                statement(campaign)
+
+        return program_result
+
     def make_bnf(self):
         expr = Forward()
 
         # Building blocks
-        LPAR, RPAR, SEMI = map(Suppress, '();')
+        LPAR, RPAR, SEMI, LBRAC, RBRAC = map(Suppress, '();{}')
         PLUS, MINUS, MULT, DIV = map(Literal, '+-*/')
+        IF, ELIF, ELSE = map(Keyword, 'if elif else'.split())
 
-        identifier = Word(alphas, alphas + "_")
+        keyword = IF | ELIF | ELSE
+
+        # func_name = Word(alphas, alphas + "_")
+        func_name = Regex(r'(?!if)[a-z][a-z_]*')
         integer = Regex(r"-?\d+")
         real = Regex(r"-?\d+\.\d*")
         true = Literal('true')
@@ -154,10 +196,25 @@ class FunctionParser:
 
         # More complex
         args = Group(Optional(delimitedList(expr))).setResultsName('args')
-        function_call = Group(identifier.setResultsName('name') + LPAR + args + RPAR)
-        code_statement = delimitedList(function_call, SEMI)
+        function_call = Group(func_name.setResultsName('name') + LPAR + args + RPAR)
 
         operand = string | integer | real | bool | function_call
+
+        # Logic
+        if_block = Forward()
+        code_block = delimitedList(function_call, SEMI)
+        logical_block = if_block | code_block
+        if_block << Literal('if') + LPAR + expr + RPAR + \
+                    LBRAC + \
+                    logical_block + \
+                    RBRAC + \
+                    ZeroOrMore(Literal('elif') + LPAR + expr + RPAR +
+                               LBRAC +
+                               logical_block +
+                               RBRAC) + \
+                    Optional(Literal('else') + LBRAC +
+                             logical_block +
+                             RBRAC)
 
         # Mathematics Basics
         addop = PLUS | MINUS
@@ -169,6 +226,9 @@ class FunctionParser:
                                   (addop, 2, opAssoc.RIGHT, self.add_parse_action)
                               ])
 
+        # Final Thing
+        program = delimitedList(logical_block, SEMI)
+
         # Parse Actions
         integer.setParseAction(self.int_parse_action)
         real.setParseAction(self.real_parse_action)
@@ -176,12 +236,12 @@ class FunctionParser:
         string.setParseAction(self.string_parse_action)
 
         function_call.setParseAction(self.make_function_parse_action())
-        function_call.setResultsName('function')
-        code_statement.setParseAction(self.code_parse_action)
+        # code_block.setParseAction(self.code_parse_action)
+        # if_block.setParseAction(self.if_parse_action)
+        logical_block.setParseAction(self.logical_parse_action)
+        program.setParseAction(self.program_parse_action)
 
-        return (
-            code_statement
-        ).setResultsName('run')
+        return program.setResultsName('run')
 
     def parse_function(self, func_string):
         try:

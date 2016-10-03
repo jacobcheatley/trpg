@@ -110,8 +110,8 @@ class Campaign:
 
     # LANGUAGE FUNCTIONS
     def run_function(self, func_string):
-        func = self.function_parser.parse_function(func_string)
-        if func is not None:
-            func.run(self)
+        program = self.function_parser.parse_function(func_string)
+        if program is not None:
+            program.run(self)
         else:
             self.debug('????')

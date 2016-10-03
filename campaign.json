@@ -103,6 +103,11 @@
           "__type__": "option",
           "desc": "Giff test item.",
           "func": "show_message('Giving test item.'); give_item('test', get_item_count('test'))"
+        },
+        {
+          "__type__": "option",
+          "desc": "SUPER TESTING",
+          "func": "show_message('start');if(false){show_message('IF')};show_message('end')"
         }
       ]
     },
