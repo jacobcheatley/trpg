@@ -95,7 +95,3 @@ class Campaign:
             # print(self.player.scenario)
         else:
             self.debug('????')
-
-    def goto(self, scenario_name):
-        """Goes to a scenario by name."""
-        self.player.scenario = scenario_name

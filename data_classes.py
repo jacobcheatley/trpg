@@ -1,4 +1,4 @@
-from typing import Mapping, Sequence, Union, Any
+from typing import Mapping, Sequence, Union, Any, Dict
 
 Func = Union[str, bool]  # typing of func will change to Union[Callable, bool]
 
@@ -32,9 +32,24 @@ class Item:
 
 
 class Inventory:
-    def __init__(self, currency: int = 0, items: Mapping[str, int] = None):
+    def __init__(self, currency: int = 0, items: Dict[str, int] = None):
         self.currency = currency
         self.items = items
+
+    def add(self, item_id, count):
+        if item_id in self.items:
+            self.items[item_id] += count
+        else:
+            self.items[item_id] = count
+
+    def remove(self, item_id, count):
+        if item_id in self.items:
+            self.items[item_id] -= count
+            if self.items[item_id] <= 0:
+                self.items.pop(item_id, None)
+        else:
+            # TODO: Refine logic
+            pass
 
 
 class StatSetting:
@@ -64,7 +79,7 @@ class OtherStat:
 
 
 class PlayerStats:
-    def __init__(self, health: ResourceStat = None, resource: Mapping[str, ResourceStat] = None,
+    def __init__(self, health: ResourceStat = None, resource: Dict[str, ResourceStat] = None,
                  other: Mapping[str, OtherStat] = None):
         self.health = health
         self.resource = resource

@@ -31,7 +31,6 @@ VOID:
 
     GLOBALS:
         set_global(variable_name: Str, value: Any)
-        get_global(variable_name: Str)
 
     SCENARIOS:
         goto(scenario_name: Str)
@@ -39,6 +38,9 @@ VOID:
     ITEMS:
         give_item(item_name: Str, count: Num)
         take_item(item_name: Str, count: Num)
+
+        give_currency(count: Num)
+        take_current(count: Num)
 
     BUFFS:
         add_buff(buff_name: Str)

@@ -3,7 +3,47 @@ from .functions import *
 
 
 tokens_map = {
-    'goto': GotoFunction
+    # Misc
+    'goto': GotoFunction,
+    'show_message': ShowMessageFunction,
+    # Stats Setters
+    'inc_stat': IncStatFunction,
+    'dec_stat': DecStatFunction,
+    'set_stat': SetStatFunction,
+    'inc_res': IncResFunction,
+    'dec_res': DecResFunction,
+    'set_res': SetResFunction,
+    'inc_res_min': IncResMinFunction,
+    'dec_res_min': DecResMinFunction,
+    'set_res_min': SetResMinFunction,
+    'inc_res_max': IncResMaxFunction,
+    'dec_res_max': DecResMaxFunction,
+    'set_res_max': SetResMaxFunction,
+    'inc_health': IncHealthFunction,
+    'dec_health': DecHealthFunction,
+    'set_health': SetHealthFunction,
+    'inc_health_min': IncHealthMinFunction,
+    'dec_health_min': DecHealthMinFunction,
+    'set_health_min': SetHealthMinFunction,
+    'inc_health_max': IncHealthMaxFunction,
+    'dec_health_max': DecHealthMaxFunction,
+    'set_health_max': SetHealthMaxFunction,
+    # Stats Getters
+    'get_stat': GetStatFunction,
+    'get_res': GetResFunction,
+    'get_res_min': GetResMinFunction,
+    'get_res_max': GetResMaxFunction,
+    'get_health': GetHealthFunction,
+    'get_health_min': GetHealthMinFunction,
+    'get_health_max': GetHealthMaxFunction,
+    # Inventory Manipulation
+    'give_item': GiveItemFunction,
+    'take_item': TakeItemFunction,
+    'give_currency': GiveCurrencyFunction,
+    'take_currency': TakeCurrencyFunction,
+    # Inventory Getters
+    'get_item_count': GetItemCountFunction,
+    'get_currency': GetCurrencyFunction,
 }
 
 
@@ -16,8 +56,6 @@ class FunctionParser:
         def func_parse_action(string, location, tokens):
             cls = tokens_map[tokens[0].name]
             args = tokens[0].args
-            # print(string)
-            # print(args)
             return cls(args)
 
         return func_parse_action
