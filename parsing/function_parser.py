@@ -5,6 +5,7 @@ tokens_map = {
     # Misc
     'goto': GotoFunction,
     'show_message': ShowMessageFunction,
+    'print': ShowMessageFunction,
     # Stats Setters
     'inc_stat': IncStatFunction,
     'dec_stat': DecStatFunction,
@@ -139,28 +140,22 @@ class FunctionParser:
     def if_parse_action(string, location, tokens):
         def do_if(campaign):
             if tokens[1]:
-                print('IF PASSED')
                 tokens[2](campaign)
                 return
-                # do this if code
             else:
                 for elif_condition, elif_code in zip(tokens[4::3], tokens[5::3]):
                     if elif_condition:
-                        print('ELIF PASSED')
                         elif_code(campaign)
                         return
-                        # do this elif code
-                else:
-                    if tokens[-2] == 'else':
-                        print('ELSE PASSED')
-                        tokens[-1](campaign)
-                        return
-                        # do this else code
+                if tokens[-2] == 'else':
+                    tokens[-1](campaign)
+                    return
 
         return do_if
 
     @staticmethod
     def logical_parse_action(string, location, tokens):
+        print(tokens)
         if tokens[0] == 'if':
             return FunctionParser.if_parse_action(string, location, tokens)
         else:
@@ -202,8 +197,8 @@ class FunctionParser:
 
         # Logic
         if_block = Forward()
-        code_block = delimitedList(function_call, SEMI)
-        logical_block = if_block | code_block
+        code_block = delimitedList(function_call | if_block, SEMI)
+        logical_block = code_block
         if_block << Literal('if') + LPAR + expr + RPAR + \
                     LBRAC + \
                     logical_block + \
@@ -236,9 +231,9 @@ class FunctionParser:
         string.setParseAction(self.string_parse_action)
 
         function_call.setParseAction(self.make_function_parse_action())
-        # code_block.setParseAction(self.code_parse_action)
-        # if_block.setParseAction(self.if_parse_action)
-        logical_block.setParseAction(self.logical_parse_action)
+        code_block.setParseAction(self.code_parse_action)
+        if_block.setParseAction(self.if_parse_action)
+        # logical_block.setParseAction(self.logical_parse_action)
         program.setParseAction(self.program_parse_action)
 
         return program.setResultsName('run')

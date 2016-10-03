@@ -107,7 +107,7 @@
         {
           "__type__": "option",
           "desc": "SUPER TESTING",
-          "func": "show_message('start');if(false){show_message('IF')};show_message('end')"
+          "func": "if(true){print('1');if(false){print('2 IF')}else{print('2 ELSE')};show_message('3')}"
         }
       ]
     },
