@@ -43,6 +43,13 @@ tokens_map = {
     # Inventory Getters
     'get_item_count': GetItemCountFunction,
     'get_currency': GetCurrencyFunction,
+    # Math
+    'round': RoundFunction,
+    'ceil': CeilFunction,
+    'floor': FloorFunction,
+    'pow': PowFunction,
+    'factorial': FactorialFunction,
+    'abs': AbsFunction
 }
 
 
@@ -65,13 +72,14 @@ class FunctionParser:
             name = tokens[0].name
             args_temp = tokens[0].args
             args = []
-            for arg_temp in args_temp:
-                try:
-                    new_arg = arg_temp(self.campaign)
-                    print(new_arg)
-                    args.append(new_arg)
-                except:
-                    args.append(arg_temp)
+            if name != 'if':
+                for arg_temp in args_temp:
+                    try:
+                        args.append(arg_temp(self.campaign))
+                    except:
+                        args.append(arg_temp)
+            else:
+                args = args_temp
             if name in tokens_map:
                 cls = tokens_map[name]
                 return cls(args)
