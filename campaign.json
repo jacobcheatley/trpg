@@ -102,7 +102,7 @@
         {
           "__type__": "option",
           "desc": "Giff test item.",
-          "func": "give_item('test', 1)"
+          "func": "show_message('Giving test item.'); give_item('test', get_item_count('test'))"
         }
       ]
     },

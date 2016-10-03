@@ -32,7 +32,7 @@ class Campaign:
 
         # Parsers for commands and functions
         self.command_parser = CommandParser()
-        self.function_parser = FunctionParser()
+        self.function_parser = FunctionParser(self)
 
     def __getitem__(self, item):
         return self.__dict__[item]
@@ -82,10 +82,9 @@ class Campaign:
 
     def choose_option(self, option_number):
         try:
-            print(self.available_options()[1].func)
             self.run_function(self.available_options()[option_number-1].func)
         except IndexError as e:
-            self.debug(e)
+            self.debug(str(e))
             self.write('Not a valid option number.')
 
     def view_inventory(self, owner):
@@ -113,7 +112,6 @@ class Campaign:
     def run_function(self, func_string):
         func = self.function_parser.parse_function(func_string)
         if func is not None:
-            func.function(self)
-            # print(self.player.scenario)
+            func.run(self)
         else:
             self.debug('????')

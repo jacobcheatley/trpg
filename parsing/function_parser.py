@@ -1,7 +1,6 @@
 from pyparsing import *
 from .functions import *
 
-
 tokens_map = {
     # Misc
     'goto': GotoFunction,
@@ -47,15 +46,32 @@ tokens_map = {
 }
 
 
-class FunctionParser:
+class OperParseActionHolder:
     def __init__(self):
-        self.bnf = self.make_bnf()
+        # initialize with a do-nothing parse action
+        self.fn = lambda s, l, t: None
 
-    @staticmethod
-    def make_function_parse_action():
+    def __call__(self, s, l, t):
+        return self.fn(s, l, t)
+
+
+class FunctionParser:
+    def __init__(self, campaign):
+        self.bnf = self.make_bnf()
+        self.campaign = campaign
+
+    def make_function_parse_action(self):
         def func_parse_action(string, location, tokens):
             name = tokens[0].name
-            args = tokens[0].args
+            args_temp = tokens[0].args
+            args = []
+            for arg_temp in args_temp:
+                try:
+                    new_arg = arg_temp(self.campaign)
+                    print(new_arg)
+                    args.append(new_arg)
+                except:
+                    args.append(arg_temp)
             if name in tokens_map:
                 cls = tokens_map[name]
                 return cls(args)
@@ -83,11 +99,43 @@ class FunctionParser:
     def real_parse_action(string, location, tokens):
         return float(string)
 
+    @staticmethod
+    def add_parse_action(string, location, tokens):
+        result = tokens[0][0]
+        for operator, operand in zip(tokens[0][1::2], tokens[0][2::2]):
+            if operator == '+':
+                result += operand
+            elif operator == '-':
+                result -= operand
+        return result
+
+    @staticmethod
+    def mult_parse_action(string, location, tokens):
+        result = tokens[0][0]
+        for operator, operand in zip(tokens[0][1::2], tokens[0][2::2]):
+            if operator == '*':
+                result *= operand
+            elif operator == '/':
+                result /= operand
+            elif operand == '%':
+                result %= operand
+        return result
+
+    @staticmethod
+    def code_parse_action(string, location, tokens):
+        def combined_function(campaign):
+            for func in tokens:
+                func(campaign)
+
+        return combined_function
+
     def make_bnf(self):
         expr = Forward()
 
         # Building blocks
         LPAR, RPAR, SEMI = map(Suppress, '();')
+        PLUS, MINUS, MULT, DIV = map(Literal, '+-*/')
+
         identifier = Word(alphas, alphas + "_")
         integer = Regex(r"-?\d+")
         real = Regex(r"-?\d+\.\d*")
@@ -99,8 +147,19 @@ class FunctionParser:
         # More complex
         args = Group(Optional(delimitedList(expr))).setResultsName('args')
         function_call = Group(identifier.setResultsName('name') + LPAR + args + RPAR)
+        code_statement = delimitedList(function_call, SEMI)
+
         operand = string | integer | real | bool | function_call
-        expr << operand  # Will soon have mathematical stuff
+
+        # Mathematics Basics
+        addop = PLUS | MINUS
+        multop = MULT | DIV
+
+        expr << infixNotation(operand,
+                              [
+                                  (multop, 2, opAssoc.LEFT, self.mult_parse_action),
+                                  (addop, 2, opAssoc.RIGHT, self.add_parse_action)
+                              ])
 
         # Parse Actions
         integer.setParseAction(self.int_parse_action)
@@ -109,10 +168,12 @@ class FunctionParser:
         string.setParseAction(self.string_parse_action)
 
         function_call.setParseAction(self.make_function_parse_action())
+        function_call.setResultsName('function')
+        code_statement.setParseAction(self.code_parse_action)
 
         return (
-            function_call
-        ).setResultsName('function')
+            code_statement
+        ).setResultsName('run')
 
     def parse_function(self, func_string):
         try:

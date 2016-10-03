@@ -17,6 +17,7 @@ class GotoFunction(Function):
 
     def _do_function(self, campaign):
         campaign.player.scenario = self.scenario_name
+        campaign.view_current_scenario()
 
 
 # DISPLAY FUNCTIONS

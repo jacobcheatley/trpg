@@ -4,4 +4,4 @@ class Function:
         pass
 
     def __call__(self, campaign):
-        self._do_function(campaign)
+        return self._do_function(campaign)
