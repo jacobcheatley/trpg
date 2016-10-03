@@ -48,12 +48,33 @@ class Campaign:
             if cmd is not None:
                 cmd.command(self)
 
-    # HELPER FUNCTIONS
+    # VIEW FUNCTIONS
     def view_current_scenario(self):
         """Prints all information about the current scenario."""
         options_text = ['{0}: {1}'.format(number + 1, option) for number, option in enumerate(self.available_options())]
         result = '**{0.name}**\n*{0.desc}*\n-\n{1}'.format(self.current_scenario(), '\n'.join(options_text))
         self.write(result)
+
+    def view_inventory(self, owner):
+        """Displays the player or shop inventory."""
+        inventory = owner.inventory
+        sorted_ids = sorted(inventory.items, key=lambda item: self.item_name(item))
+        data = [(inventory.items[item_id], self.item_name(item_id), item_id) for item_id in sorted_ids]
+        items_text = ['- {0[0]} {0[1]} [\'{0[2]}\']'.format(item_info) for item_info in data]
+        self.write('**Currency:** {0.currency}\n**Items:**\n{1}'.format(inventory, '\n'.join(items_text)))
+
+    def view_stats(self):
+        """Displays the player's stats."""
+        stats = self.player.stats
+        health_string = '**{}:**: {}/{}'.format(self.health_setting().name, stats.health.current, stats.health.max)
+
+        resources_data = ((self.resource_setting(stat_id).name, stat.current, stat.max) for stat_id, stat in sorted(stats.resource.items()))
+        resources_string = '\n'.join(('**{}:**: {}/{}'.format(name, current, max) for name, current, max in resources_data))
+
+        other_data = ((self.other_setting(stat_id).name, stat.current) for stat_id, stat in sorted(stats.other.items()))
+        other_string = '\n'.join(('**{}:**: {}'.format(name, current) for name, current in other_data))
+
+        self.write('{}\n-\n{}\n-\n{}'.format(health_string, resources_string, other_string))
 
     # HELPER GETTERS
     def item_name(self, item_id):
@@ -86,27 +107,6 @@ class Campaign:
         except IndexError as e:
             self.debug(str(e))
             self.write('Not a valid option number.')
-
-    def view_inventory(self, owner):
-        """Displays the player or shop inventory."""
-        inventory = owner.inventory
-        sorted_ids = sorted(inventory.items, key=lambda item: self.item_name(item))
-        data = [(inventory.items[item_id], self.item_name(item_id), item_id) for item_id in sorted_ids]
-        items_text = ['- {0[0]} {0[1]} [\'{0[2]}\']'.format(item_info) for item_info in data]
-        self.write('**Currency:** {0.currency}\n**Items:**\n{1}'.format(inventory, '\n'.join(items_text)))
-
-    def view_stats(self):
-        """Displays the player's stats."""
-        stats = self.player.stats
-        health_string = '**{}:**: {}/{}'.format(self.health_setting().name, stats.health.current, stats.health.max)
-
-        resources_data = ((self.resource_setting(stat_id).name, stat.current, stat.max) for stat_id, stat in sorted(stats.resource.items()))
-        resources_string = '\n'.join(('**{}:**: {}/{}'.format(name, current, max) for name, current, max in resources_data))
-
-        other_data = ((self.other_setting(stat_id).name, stat.current) for stat_id, stat in sorted(stats.other.items()))
-        other_string = '\n'.join(('**{}:**: {}'.format(name, current) for name, current in other_data))
-
-        self.write('{}\n-\n{}\n-\n{}'.format(health_string, resources_string, other_string))
 
     # LANGUAGE FUNCTIONS
     def run_function(self, func_string):
