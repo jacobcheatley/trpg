@@ -6,6 +6,9 @@ tokens_map = {
     'goto': GotoFunction,
     'show_message': ShowMessageFunction,
     'print': ShowMessageFunction,
+    # Functional
+    'custom': CustomFunction,
+    'repeat': RepeatFunction,
     # Stats Setters
     'inc_stat': IncStatFunction,
     'dec_stat': DecStatFunction,
@@ -72,7 +75,6 @@ class FunctionParser:
 
     def make_function_parse_action(self):
         def func_parse_action(string, location, tokens):
-            # print('::', tokens)
             name = tokens[0].name
             args_temp = tokens[0].args
             args = []
@@ -106,12 +108,10 @@ class FunctionParser:
 
     @staticmethod
     def real_parse_action(string, location, tokens):
-        print(tokens)
         return float(tokens[0])
 
     @staticmethod
     def not_parse_action(string, location, tokens):
-        print(tokens)
         return not tokens[0][1]
 
     @staticmethod
@@ -195,7 +195,6 @@ class FunctionParser:
 
     @staticmethod
     def logical_parse_action(string, location, tokens):
-        print(tokens)
         if tokens[0] == 'if':
             return FunctionParser.if_parse_action(string, location, tokens)
         else:

@@ -34,7 +34,7 @@
     "gold_gold": false
   },
   "funcs": {
-
+    "ex_print": "print('!' + [0] + '!')"
   },
   "stats": {
     "__type__": "stat_settings",
@@ -102,7 +102,7 @@
         {
           "__type__": "option",
           "desc": "Giff test item.",
-          "func": "show_message('Giving test item.'); give_item('test', get_item_count('test'))"
+          "func": "show_message('Giving test item.'); give_item('test', 1)"
         },
         {
           "__type__": "option",
@@ -112,7 +112,12 @@
         {
           "__type__": "option",
           "desc": "SPAM ME PLS",
-          "func": "print('KEK' * 100)"
+          "func": "repeat(get_item_count('test'), 'print', 'KEK' * 100)"
+        },
+        {
+          "__type__": "option",
+          "desc": "EX PRINT",
+          "func": "custom('ex_print', 'TEST')"
         }
       ]
     },
