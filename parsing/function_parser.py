@@ -55,17 +55,12 @@ tokens_map = {
     'factorial': FactorialFunction,
     'abs': AbsFunction,
     'max': MaxFunction,
-    'min': MinFunction
+    'min': MinFunction,
+    # Random
+    'rand_int': RandIntFunction,
+    'rand_choice': RandChoiceFunction,
+    'rand_chance': RandChanceFunction
 }
-
-
-class OperParseActionHolder:
-    def __init__(self):
-        # initialize with a do-nothing parse action
-        self.fn = lambda s, l, t: None
-
-    def __call__(self, s, l, t):
-        return self.fn(s, l, t)
 
 
 class FunctionParser:
@@ -73,16 +68,19 @@ class FunctionParser:
         self.bnf = self.make_bnf()
         self.campaign = campaign
 
+    def early_eval(self, arg):
+        try:
+            return arg(self.campaign)
+        except:
+            return arg
+
     def make_function_parse_action(self):
         def func_parse_action(string, location, tokens):
             name = tokens[0].name
             args_temp = tokens[0].args
             args = []
             for arg_temp in args_temp:
-                try:
-                    args.append(arg_temp(self.campaign))
-                except:
-                    args.append(arg_temp)
+                args.append(self.early_eval(arg_temp))
             if name in tokens_map:
                 cls = tokens_map[name]
                 return cls(args)
@@ -176,15 +174,16 @@ class FunctionParser:
 
         return combined_function
 
-    @staticmethod
-    def if_parse_action(string, location, tokens):
+    def if_parse_action(self, string, location, tokens):
         def do_if(campaign):
-            if tokens[1]:
+            if_result = self.early_eval(tokens[1])
+            if if_result:
                 tokens[2](campaign)
                 return
             else:
                 for elif_condition, elif_code in zip(tokens[4::3], tokens[5::3]):
-                    if elif_condition:
+                    elif_result = self.early_eval(elif_condition)
+                    if elif_result:
                         elif_code(campaign)
                         return
                 if tokens[-2] == 'else':

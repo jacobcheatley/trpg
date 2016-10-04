@@ -34,7 +34,8 @@
     "gold_gold": false
   },
   "funcs": {
-    "ex_print": "print('!' + [0] + '!')"
+    "ex_print": "print('!' + [0] + '!')",
+    "gamble": "print('You put a coin in.');if(rand_chance(0.5)){print('WINNER');give_currency(1)}else{print('LOSER');take_currency(1)}"
   },
   "stats": {
     "__type__": "stat_settings",
@@ -124,12 +125,17 @@
     "forest": {
       "__type__": "scenario",
       "name": "The Forest",
-      "desc": "A forest. Nothing to see here.{if(global('got_gold'), ' Except a pile of gold on the ground.', '')}",
+      "desc": "A forest. Nothing much to see here.",
       "options": [
         {
           "__type__": "option",
           "desc": "Well if it's so lame here, how about you go back.",
           "func": "goto('start')"
+        },
+        {
+          "__type__": "option",
+          "desc": "For some reason there's a gambling machine here. LUL.",
+          "func": "custom('gamble')"
         }
       ]
     }
