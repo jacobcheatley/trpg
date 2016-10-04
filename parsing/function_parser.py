@@ -104,7 +104,45 @@ class FunctionParser:
 
     @staticmethod
     def real_parse_action(string, location, tokens):
-        return float(string)
+        print(tokens)
+        return float(tokens[0])
+
+    @staticmethod
+    def not_parse_action(string, location, tokens):
+        print(tokens)
+        return not tokens[0][1]
+
+    @staticmethod
+    def compare_parse_action(string, location, tokens):
+        tokens = tokens[0]
+        if tokens[1] == '<':
+            return tokens[0] < tokens[2]
+        elif tokens[1] == '>':
+            return tokens[0] > tokens[2]
+        elif tokens[1] == '<=':
+            return tokens[0] <= tokens[2]
+        elif tokens[1] == '>=':
+            return tokens[0] >= tokens[2]
+        return False  # This shouldn't happen
+
+    @staticmethod
+    def eq_parse_action(string, location, tokens):
+        tokens = tokens[0]
+        if tokens[1] == '==':
+            return tokens[0] == tokens[2]
+        elif tokens[1] == '!=':
+            return tokens[0] != tokens[2]
+        return False  # This shouldn't happen
+
+    @staticmethod
+    def and_parse_action(string, location, tokens):
+        tokens = tokens[0]
+        return tokens[0] and tokens[2]
+
+    @staticmethod
+    def or_parse_action(string, location, tokens):
+        tokens = tokens[0]
+        return tokens[0] or tokens[2]
 
     @staticmethod
     def add_parse_action(string, location, tokens):
@@ -165,7 +203,6 @@ class FunctionParser:
     def program_parse_action(string, location, tokens):
         def program_result(campaign):
             for statement in tokens:
-                # print(statement)
                 statement(campaign)
 
         return program_result
@@ -174,16 +211,18 @@ class FunctionParser:
         expr = Forward()
 
         # Building blocks
-        LPAR, RPAR, SEMI, LBRAC, RBRAC = map(Suppress, '();{}')
         PLUS, MINUS, MULT, DIV = map(Literal, '+-*/')
+        LPAR, RPAR, SEMI, LBRAC, RBRAC = map(Suppress, '();{}')
+        NOT = Literal('!')
+        LT, GT, LTE, GTE = map(Literal, '< > <= >='.split())
+        EQ, NEQ = map(Literal, '== !='.split())
+        AND, OR = map(Literal, '&& ||'.split())
         IF, ELIF, ELSE = map(Keyword, 'if elif else'.split())
-
-        keyword = IF | ELIF | ELSE
 
         # func_name = Word(alphas, alphas + "_")
         func_name = Regex(r'(?!if)[a-z][a-z_]*')
-        integer = Regex(r"-?\d+")
-        real = Regex(r"-?\d+\.\d*")
+        integer = Regex(r'-?\d+')
+        real = Regex(r'-?\d+\.\d*')
         true = Literal('true')
         false = Literal('false')
         bool = true | false
@@ -193,7 +232,7 @@ class FunctionParser:
         args = Group(Optional(delimitedList(expr))).setResultsName('args')
         function_call = Group(func_name.setResultsName('name') + LPAR + args + RPAR)
 
-        operand = string | integer | real | bool | function_call
+        operand = string | real | integer | bool | function_call
 
         # Logic
         if_block = Forward()
@@ -211,14 +250,26 @@ class FunctionParser:
                              logical_block +
                              RBRAC)
 
-        # Mathematics Basics
+        # Mathematics Operators
         addop = PLUS | MINUS
         multop = MULT | DIV
 
+        # Boolean Operators
+        notop = NOT
+        compareop = LTE | GTE | LT | GT
+        eqop = EQ | NEQ
+        andop = AND
+        orop = OR
+
         expr << infixNotation(operand,
                               [
+                                  (notop, 1, opAssoc.RIGHT, self.not_parse_action),
                                   (multop, 2, opAssoc.LEFT, self.mult_parse_action),
-                                  (addop, 2, opAssoc.RIGHT, self.add_parse_action)
+                                  (addop, 2, opAssoc.LEFT, self.add_parse_action),
+                                  (compareop, 2, opAssoc.LEFT, self.compare_parse_action),
+                                  (eqop, 2, opAssoc.LEFT, self.eq_parse_action),
+                                  (andop, 2, opAssoc.LEFT, self.and_parse_action),
+                                  (orop, 2, opAssoc.LEFT, self.or_parse_action)
                               ])
 
         # Final Thing
