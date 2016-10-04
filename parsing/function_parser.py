@@ -50,7 +50,9 @@ tokens_map = {
     'floor': FloorFunction,
     'pow': PowFunction,
     'factorial': FactorialFunction,
-    'abs': AbsFunction
+    'abs': AbsFunction,
+    'max': MaxFunction,
+    'min': MinFunction
 }
 
 
@@ -284,7 +286,6 @@ class FunctionParser:
         function_call.setParseAction(self.make_function_parse_action())
         code_block.setParseAction(self.code_parse_action)
         if_block.setParseAction(self.if_parse_action)
-        # logical_block.setParseAction(self.logical_parse_action)
         program.setParseAction(self.program_parse_action)
 
         return program.setResultsName('run')

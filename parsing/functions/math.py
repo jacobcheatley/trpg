@@ -49,3 +49,19 @@ class AbsFunction(Function):
 
     def _do_function(self, campaign):
         return abs(self.number)
+
+
+class MaxFunction(Function):
+    def __init__(self, args):
+        self.numbers = args
+
+    def _do_function(self, campaign):
+        return max(self.numbers)
+
+
+class MinFunction(Function):
+    def __init__(self, args):
+        self.numbers = args
+
+    def _do_function(self, campaign):
+        return min(self.numbers)
