@@ -199,15 +199,15 @@ class FunctionParser:
         if_block = Forward()
         code_block = delimitedList(function_call | if_block, SEMI)
         logical_block = code_block
-        if_block << Literal('if') + LPAR + expr + RPAR + \
+        if_block << IF + LPAR + expr + RPAR + \
                     LBRAC + \
                     logical_block + \
                     RBRAC + \
-                    ZeroOrMore(Literal('elif') + LPAR + expr + RPAR +
+                    ZeroOrMore(ELIF + LPAR + expr + RPAR +
                                LBRAC +
                                logical_block +
                                RBRAC) + \
-                    Optional(Literal('else') + LBRAC +
+                    Optional(ELSE + LBRAC +
                              logical_block +
                              RBRAC)
 
