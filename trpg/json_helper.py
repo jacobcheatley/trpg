@@ -1,4 +1,4 @@
-from data_classes import *
+from trpg.data_classes import *
 
 
 def hook(obj):

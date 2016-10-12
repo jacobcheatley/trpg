@@ -43,7 +43,10 @@ class GetItemCountFunction(Function):
         self.item_id = args[0]
 
     def _do_function(self, campaign):
-        return campaign.player.inventory.items[self.item_id]
+        inventory_items = campaign.player.inventory.items
+        if self.item_id in inventory_items:
+            return inventory_items[self.item_id]
+        return 0
 
 
 class GetCurrencyFunction(Function):

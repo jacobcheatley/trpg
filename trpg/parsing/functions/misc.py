@@ -42,7 +42,6 @@ class SetGlobalFunction(Function):
 class GetGlobalFunction(Function):
     def __init__(self, args):
         self.name = args[0]
-        self.value = args[1]
 
     def _do_function(self, campaign):
         return campaign.globals[self.name]

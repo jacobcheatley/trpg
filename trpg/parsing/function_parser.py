@@ -59,7 +59,10 @@ tokens_map = {
     # Random
     'rand_int': RandIntFunction,
     'rand_choice': RandChoiceFunction,
-    'rand_chance': RandChanceFunction
+    'rand_chance': RandChanceFunction,
+    # Global
+    'set_global': SetGlobalFunction,
+    'get_global': GetGlobalFunction
 }
 
 
@@ -108,62 +111,56 @@ class FunctionParser:
     def real_parse_action(string, location, tokens):
         return float(tokens[0])
 
-    @staticmethod
-    def not_parse_action(string, location, tokens):
-        return not tokens[0][1]
+    def not_parse_action(self, string, location, tokens):
+        return not self.early_eval(tokens[0][1])
 
-    @staticmethod
-    def compare_parse_action(string, location, tokens):
+    def compare_parse_action(self, string, location, tokens):
         tokens = tokens[0]
         if tokens[1] == '<':
-            return tokens[0] < tokens[2]
+            return self.early_eval(tokens[0]) < self.early_eval(tokens[2])
         elif tokens[1] == '>':
-            return tokens[0] > tokens[2]
+            return self.early_eval(tokens[0]) > self.early_eval(tokens[2])
         elif tokens[1] == '<=':
-            return tokens[0] <= tokens[2]
+            return self.early_eval(tokens[0]) <= self.early_eval(tokens[2])
         elif tokens[1] == '>=':
-            return tokens[0] >= tokens[2]
+            return self.early_eval(tokens[0]) >= self.early_eval(tokens[2])
         return False  # This shouldn't happen
 
     @staticmethod
-    def eq_parse_action(string, location, tokens):
+    def eq_parse_action(self, string, location, tokens):
         tokens = tokens[0]
         if tokens[1] == '==':
-            return tokens[0] == tokens[2]
+            return self.early_eval(tokens[0]) == self.early_eval(tokens[2])
         elif tokens[1] == '!=':
-            return tokens[0] != tokens[2]
+            return self.early_eval(tokens[0]) != self.early_eval(tokens[2])
         return False  # This shouldn't happen
 
-    @staticmethod
-    def and_parse_action(string, location, tokens):
+    def and_parse_action(self, string, location, tokens):
         tokens = tokens[0]
-        return tokens[0] and tokens[2]
+        return self.early_eval(tokens[0]) and self.early_eval(tokens[2])
 
-    @staticmethod
-    def or_parse_action(string, location, tokens):
+    def or_parse_action(self, string, location, tokens):
         tokens = tokens[0]
-        return tokens[0] or tokens[2]
+        return self.early_eval(tokens[0]) or self.early_eval(tokens[2])
 
-    @staticmethod
-    def add_parse_action(string, location, tokens):
-        result = tokens[0][0]
+    def add_parse_action(self, string, location, tokens):
+        result = self.early_eval(tokens[0][0])
         for operator, operand in zip(tokens[0][1::2], tokens[0][2::2]):
             if operator == '+':
-                result += operand
+                result += self.early_eval(operand)
             elif operator == '-':
-                result -= operand
+                result -= self.early_eval(operand)
         return result
 
-    @staticmethod
-    def mult_parse_action(string, location, tokens):
-        result = tokens[0][0]
+    def mult_parse_action(self, string, location, tokens):
+        result = self.early_eval(tokens[0][0])
         for operator, operand in zip(tokens[0][1::2], tokens[0][2::2]):
             if operator == '*':
-                result *= operand
+                result *= self.early_eval(operand)
             elif operator == '/':
-                result /= operand
+                result /= self.early_eval(operand)
             elif operand == '%':
-                result %= operand
+                result %= self.early_eval(operand)
         return result
 
     @staticmethod

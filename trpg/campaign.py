@@ -1,7 +1,9 @@
 import json
-from json_helper import hook
-from parsing.command_parser import CommandParser
-from parsing.function_parser import FunctionParser
+
+from trpg.json_helper import hook
+
+from trpg.parsing.command_parser import CommandParser
+from trpg.parsing.function_parser import FunctionParser
 
 
 # Random Functions
