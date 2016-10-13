@@ -12,8 +12,12 @@ def default_debug(message):
 
 
 class Campaign:
-    def __init__(self, json_fp, read=input, write=print, debug=default_debug):
+    def __init__(self, json_fp, read=input, write=print, debug=default_debug, bold=('**', '**'), italic=('*', '*')):
         """Represents all the data in an entire running campaign"""
+
+        # Formatting stuff
+        self.bold = bold
+        self.italic = italic
 
         # Get a temporary dictionary of the deserialized campaign data
         dictionary_rep = json.load(open(json_fp, 'r'), object_hook=hook)
@@ -54,7 +58,7 @@ class Campaign:
     def view_current_scenario(self):
         """Prints all information about the current scenario."""
         options_text = ['{0}: {1}'.format(number + 1, option) for number, option in enumerate(self.available_options())]
-        result = '**{0.name}**\n*{0.desc}*\n-\n{1}'.format(self.current_scenario(), '\n'.join(options_text))
+        result = '{2[0]}{0.name}{2[1]}\n{3[0]}{0.desc}{3[1]}\n-\n{1}'.format(self.current_scenario(), '\n'.join(options_text), self.bold, self.italic)
         self.write(result)
 
     def view_inventory(self, owner):
@@ -63,18 +67,18 @@ class Campaign:
         sorted_ids = sorted(inventory.items, key=lambda item: self.item_name(item))
         data = [(inventory.items[item_id], self.item_name(item_id), item_id) for item_id in sorted_ids]
         items_text = ['- {0[0]} {0[1]} [\'{0[2]}\']'.format(item_info) for item_info in data]
-        self.write('**Currency:** {0.currency}\n**Items:**\n{1}'.format(inventory, '\n'.join(items_text)))
+        self.write('{2[0]}Currency:{2[1]} {0.currency}\n{2[0]}Items:{2[0]}\n{1}'.format(inventory, '\n'.join(items_text), self.bold))
 
     def view_stats(self):
         """Displays the player's stats."""
         stats = self.player.stats
-        health_string = '**{}:**: {}/{}'.format(self.health_setting().name, stats.health.current, stats.health.max)
+        health_string = '{3[0]}{0}:{3[1]}: {1}/{2}'.format(self.health_setting().name, stats.health.current, stats.health.max, self.bold)
 
         resources_data = ((self.resource_setting(stat_id).name, stat.current, stat.max) for stat_id, stat in sorted(stats.resource.items()))
-        resources_string = '\n'.join(('**{}:**: {}/{}'.format(name, current, max) for name, current, max in resources_data))
+        resources_string = '\n'.join(('{3[0]}{0}:{3[1]}: {1}/{2}'.format(name, current, max, self.bold) for name, current, max in resources_data))
 
         other_data = ((self.other_setting(stat_id).name, stat.current) for stat_id, stat in sorted(stats.other.items()))
-        other_string = '\n'.join(('**{}:**: {}'.format(name, current) for name, current in other_data))
+        other_string = '\n'.join(('{2[0]}{0}:{2[1]}: {1}'.format(name, current, self.bold) for name, current in other_data))
 
         self.write('{}\n-\n{}\n-\n{}'.format(health_string, resources_string, other_string))
 

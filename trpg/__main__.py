@@ -21,7 +21,12 @@ def main(file_location=None, write=print, debug=lambda x: None, read=input):
         else:
             campaign_location = os.path.abspath(file_location)
 
-        campaign = Campaign(campaign_location, write=write, debug=debug, read=read)
+        campaign = Campaign(campaign_location,
+                            write=write,
+                            debug=debug,
+                            read=read,
+                            bold=('<b>', '</b>'),
+                            italic=('<i>', '</i>'))
         campaign.run()
     except FileNotFoundError:
         print('File not found.')
